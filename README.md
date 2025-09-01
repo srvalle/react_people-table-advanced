@@ -15,6 +15,8 @@ implement the ability to filter and sort people in the table.
     - if the input is empty there should not be `query` in the search params.
 1. `CenturyFilter` should allow to choose several centuries or all of them.
     - add `centuries` search params using `append` method  `getAll` method;
+1.  **(Extra)** `SexFilter` allows filtering by sex (`m` or `f`).
+    - uses the `sex` search param.
 1. Implement sorting by `name`, `sex`, `born` and `died` by clicking on arrows in a `th`;
     - the first click on a column sorts people by the selected field ascending (`a -> z` or `0 -> 9`);
     - the second click (when people are already sorted ascending by this field) reverses the order of sorting;

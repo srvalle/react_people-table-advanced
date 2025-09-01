@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import classNames from 'classnames';
 import { SearchLink } from './SearchLink';
 import { Person } from '../types/Person';
+import { getCentury } from '../utils/getCentury';
 
 type Props = {
   people: Person[];
@@ -21,7 +22,12 @@ export const PeopleFilters: React.FC<Props> = ({
   const sex = searchParams.get('sex') || '';
 
   const availableCenturies = Array.from(
-    new Set(people.map(person => Math.ceil(person.born / 100).toString())),
+    new Set(
+      people
+        .map(person => getCentury(person.born))
+        .filter((century): century is number => !!century)
+        .map(century => century.toString()),
+    ),
   ).sort();
 
   useEffect(() => {

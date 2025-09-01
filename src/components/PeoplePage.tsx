@@ -5,6 +5,7 @@ import { Loader } from './Loader';
 import { PeopleTable } from './PeopleTable';
 import { Person } from '../types/Person';
 import { getPeople } from '../api';
+import { getCentury } from '../utils/getCentury';
 
 export const PeoplePage = () => {
   const [people, setPeople] = useState<Person[]>([]);
@@ -63,9 +64,13 @@ export const PeoplePage = () => {
 
     if (centuries.length) {
       filteredPeople = filteredPeople.filter(person => {
-        const century = Math.ceil(person.born / 100).toString();
+        const personCentury = getCentury(person.born);
 
-        return centuries.includes(century);
+        if (!personCentury) {
+          return false;
+        }
+
+        return centuries.includes(personCentury.toString());
       });
     }
 
@@ -74,13 +79,27 @@ export const PeoplePage = () => {
         const fieldA = a[sort as keyof Person];
         const fieldB = b[sort as keyof Person];
 
-        if (fieldA === null || fieldB === null) {
-          return 0;
+        // Rule: nulls/undefined are considered "greater" and go to the end in ascending sort
+        if (fieldA == null && fieldB == null) {
+          return 0; // Both are null/undefined, treat as equal
+        }
+        if (fieldA == null) {
+          return 1; // a is null, so it's "greater"
+        }
+        if (fieldB == null) {
+          return -1; // b is null, so it's "greater"
         }
 
-        return typeof fieldA === 'string'
-          ? fieldA.localeCompare(fieldB as string)
-          : (fieldA as number) - (fieldB as number);
+        // Now we know values are not null, proceed with typed comparison
+        if (typeof fieldA === 'string' && typeof fieldB === 'string') {
+          return fieldA.localeCompare(fieldB);
+        }
+
+        if (typeof fieldA === 'number' && typeof fieldB === 'number') {
+          return fieldA - fieldB;
+        }
+
+        return 0;
       });
 
       if (order === 'desc') {
